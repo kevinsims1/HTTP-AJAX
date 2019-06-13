@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 
+import './friendsList.css';
+
 class FriendsList extends React.Component {
   constructor() {
     super();
@@ -30,21 +32,31 @@ class FriendsList extends React.Component {
     }
   
     handleSubmit(event) {
-      alert('A name was submitted: ' + this.state.value);
       event.preventDefault();
+      this.addFriend()
     }
   
-    addStudent = () => {
+    addFriend = (e) => {
+      e.preventDefault();
       // immutability in react/javascript
-      const newStudent = {
+      const newFriend = {
         name: this.state.name,
         age: this.state.age,
         email: this.state.email
           
       };
-      this.setState({
-        friendsList: [...this.state.friendsList, newStudent] //newArray with an added student
-      });
+
+      axios.post('http://localhost:5000/friends', newFriend)
+      .then(response => {
+        console.log(response)
+          this.setState({ friends: response.data });
+      })
+      .catch( err => {
+        console.log(err)
+      })     
+      // this.setState({
+      //   friendsList: [...this.state.friendsList, newFriend] //newArray with an added student
+      // });
     };
 
   render(){
@@ -63,7 +75,7 @@ class FriendsList extends React.Component {
         </div>
       ))}
 
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.addFriend} className="form">
           <label>
             Name:
             <input type="text" value={this.state.name} name='name' onChange={this.handleChange} />
