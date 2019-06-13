@@ -54,9 +54,6 @@ class FriendsList extends React.Component {
       .catch( err => {
         console.log(err)
       })     
-      // this.setState({
-      //   friendsList: [...this.state.friendsList, newFriend] //newArray with an added student
-      // });
     };
 
   render(){
