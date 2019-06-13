@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import {  Route, NavLink } from 'react-router-dom'
+import FriendForm from './friendsform'
 
 import './friendsList.css';
 
@@ -14,6 +16,8 @@ class FriendsList extends React.Component {
       };
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+      this.deleteFriend = this.deleteFriend.bind(this);
+      this.setUpdateForm = this.setUpdateForm.bind(this);
     }
   
     componentDidMount() {
@@ -56,10 +60,50 @@ class FriendsList extends React.Component {
       })     
     };
 
+    deleteFriend = (e, id) => {
+      e.preventDefault();
+      axios
+        .delete(`http://localhost:5000/friends/${id}`)
+        .then(response => {
+          this.setState({
+            friends: response.data
+          });
+    
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    };
+
+    setUpdateForm = (e, friend) => {
+      e.preventDefault();
+      this.setState({
+        activefriend: friend
+      });
+      this.props.history.push('/friend-form');
+    };
+  
+   
+    updateFriend = (e, friend) => {
+      e.preventDefault();
+      axios
+        .put(`http://localhost:3333/friends/${friend.id}`, friend)
+        .then(res => {
+          this.setState({
+            activefriend: null,
+            friends: res.data
+          });
+          this.props.history.push('/friend-form');
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    };
+
   render(){
   
   return (
-    <div className="items-list-wrapper">
+    <div className="friends-list-wrapper">
       {this.state.friends.map(friend => (
         <div
           className="friend-card"
@@ -69,6 +113,10 @@ class FriendsList extends React.Component {
           <p>{friend.name}</p>
           <p>{friend.age}</p>
           <p>{friend.email}</p>
+          <NavLink to="/friend-form">Update Friend</NavLink>
+          <button onClick={e => this.deleteFriend(e, friend.id)} className="md-button">
+        Delete friend
+      </button>
         </div>
       ))}
 
@@ -86,7 +134,25 @@ class FriendsList extends React.Component {
             <input type="text" value={this.state.email} name='email' onChange={this.handleChange} />
           </label>
           <input type="submit" value="Submit" />
+          
       </form>
+     <Route 
+      exact path="/"
+      component={FriendsList}
+     />
+
+
+      <Route
+          path="/friend-form"
+          render={props => (
+            <FriendForm
+              {...props}
+              activefriend={this.state.activefriend}
+              addfriend={this.addfriend}
+              updatefriend={this.updatefriend}
+            />
+          )}
+        />
     </div>
   );
 }
